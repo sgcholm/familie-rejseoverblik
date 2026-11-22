@@ -3,6 +3,12 @@ on:
   schedule:
     - cron: '15 7 * * *'
   workflow_dispatch:
+    inputs:
+      send_test_email:
+        description: 'Send testmail til begge modtagere (ingen Dropbox-ændringer)'
+        required: true
+        type: boolean
+        default: false
 permissions:
   contents: read
 jobs:
@@ -20,5 +26,6 @@ jobs:
           DROPBOX_REFRESH_TOKEN: ${{ secrets.DROPBOX_REFRESH_TOKEN }}
           GMAIL_USER: ${{ secrets.GMAIL_ADDRESS }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          SEND_TEST_EMAIL: ${{ github.event.inputs.send_test_email || 'false' }}
           TZ: Europe/Copenhagen
         run: python reminders.py
