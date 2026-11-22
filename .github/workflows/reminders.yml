@@ -6,7 +6,12 @@ on:
     inputs:
       test_dates:
         description: 'Test alle påmindelsesdatoer (uden e-mail og Dropbox)'
-        required: true
+        required: false
+        type: boolean
+        default: false
+      test_reminder_email:
+        description: 'Send fiktiv visumpåmindelse til min Gmail (uden Dropbox)'
+        required: false
         type: boolean
         default: false
 permissions:
@@ -16,11 +21,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
-      - name: Tjek frister eller test datoer
+      - name: Tjek frister eller kør test
         env:
           DROPBOX_APP_KEY: ${{ secrets.DROPBOX_APP_KEY }}
           DROPBOX_REFRESH_TOKEN: ${{ secrets.DROPBOX_REFRESH_TOKEN }}
@@ -28,9 +33,15 @@ jobs:
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           TZ: Europe/Copenhagen
           TEST_DATES: ${{ inputs.test_dates || 'false' }}
+          TEST_REMINDER_EMAIL: ${{ inputs.test_reminder_email || 'false' }}
         run: |
-          if [ "$TEST_DATES" = "true" ]; then
+          if [ "$TEST_DATES" = "true" ] && [ "$TEST_REMINDER_EMAIL" = "true" ]; then
+            echo 'Vælg kun én test ad gangen.' >&2
+            exit 1
+          elif [ "$TEST_DATES" = "true" ]; then
             python reminders.py --test-dates
+          elif [ "$TEST_REMINDER_EMAIL" = "true" ]; then
+            python reminders.py --test-reminder-email
           else
             python reminders.py
           fi
