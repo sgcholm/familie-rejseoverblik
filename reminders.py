@@ -95,7 +95,7 @@ def test_reminder_email():
                 'certainty': 'confirmed', 'notes': 'FIKTIV TEST – ikke et rigtigt visum'}]
     matches = collect_matches(fixture, {'Carsten'}, TODAY)
     assert len(matches) == 1 and 'Visas – Canada' in matches[0] and '10 dage før' in matches[0], matches
-    send_reminder(gmail_user, gmail_password, gmail_user, matches, test=True)
+    send_reminder(gmail_user, gmail_password, '8151213@gmail.com', matches, test=True)
     print('VISUM-E-MAILTEST BESTÅET. Ingen Dropbox-data læst eller ændret.')
 
 
